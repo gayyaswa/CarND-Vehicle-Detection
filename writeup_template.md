@@ -59,6 +59,33 @@ I tried various combinations of parameters and...
 
 I trained a linear SVM using...
 
+| Color Space        | HOG Channel           | Features Length  | SVC Test Accuracy  |  SVC Training Time(s) | Extract HOG (s) |
+| ------------------ |:---------------------:| ----------------:|-------------------:|----------------------:|-----------------:
+| RGB                | 0                     |1764              | 0.96               | 0.42                  |9.54             |
+| RGB                | 1                     |1764              | 0.97               | 1.37                  |8.56             |
+| RGB                | 2                     |1764              | 0.97               | 0.44                  |8.35             |
+| RGB                | ALL                   |5292              | 0.98               | 0.87                  |19.0             |
+| HSV                | 0                     |1764              | 0.94               | 0.94                  |8.36             |
+| HSV                | 1                     |1764              | 0.95               | 1.51                  |8.54             |
+| HSV                | 2                     |1764              | 0.96               | 1.36                  |8.50             |
+| HSV                | ALL                   |5292              | 1.00               | 0.58                  |19.13            |
+| LUV                | 0                     |1764              | 0.97               | 1.35                  |8.40             |
+| LUV                | 1                     |1764              | 0.96               | 1.62                  |8.46             |
+| LUV                | 2                     |1764              | 0.97               | 1.47                  |8.53             |
+| LUV                | ALL                   |5292              | 0.99               | 0.53                  |18.92            |
+| HLS                | 0                     |1764              | 0.92               | 0.75                  |8.22             |
+| HLS                | 1                     |1764              | 0.96               | 1.33                  |8.34             |
+| HLS                | 2                     |1764              | 0.95               | 1.59                  |8.50             |
+| HLS                | ALL                   |5292              | 0.99               | 0.55                  |19.06            |
+| YUV                | 0                     |1764              | 0.98               | 1.34                  |8.18             |
+| YUV                | 1                     |1764              | 0.93               | 0.52                  |8.46             |
+| YUV                | 2                     |1764              | 0.93               | 1.93                  |8.48             |
+| YUV                | ALL                   |5292              | 0.99               | 0.57                  |19.45            |
+| YCrCb              | 0                     |1764              | 0.98               | 1.26                  |8.45             |
+| YCrCb              | 1                     |1764              | 0.96               | 1.81                  |8.44             |
+| YCrCb              | 2                     |1764              | 0.96               | 1.81                  |8.51             |
+| YCrCb              | ALL                   |5292              | 0.99               | 0.52                  |19.30            |
+ 
 ### Sliding Window Search
 
 #### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
