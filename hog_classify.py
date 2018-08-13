@@ -31,13 +31,15 @@ class HogClassifier:
     # Have this function call bin_spatial() and color_hist()
     def extract_features(self, imgs, cspace='RGB', orient=9,
                          pix_per_cell=8, cell_per_block=2, hog_channel=0,spatial_size=(32, 32),
-                         hist_bins=32):
+                         hist_bins=32, spatial_feature=True, hist_feature=True, hog_feature=True ):
         # Create a list to append feature vectors to
         features = []
         # Iterate through the list of images
         for file in imgs:
+            img_features=[]
             # Read in each one by one
-            image = mpimg.imread(file)
+            img =cv2.imread(file)
+            image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             # apply color conversion if other than 'RGB'
             if cspace != 'RGB':
                 if cspace == 'HSV':
@@ -53,32 +55,64 @@ class HogClassifier:
             else:
                 feature_image = np.copy(image)
 
+            if spatial_feature == True:
+                spatial_features = self.extractfeatures.bin_spatial(feature_image, size=spatial_size)
+                img_features.append(spatial_features)
+            if hist_feature == True:
+                # Apply color_hist()
+                hist_features = self.extractfeatures.color_hist(feature_image, nbins=hist_bins)
+                img_features.append(hist_features)
             # Call get_hog_features() with vis=False, feature_vec=True
-            if hog_channel == 'ALL':
-                hog_features = []
-                for channel in range(feature_image.shape[2]):
-                    hog_features.append(self.extractfeatures.get_hog_features(feature_image[:, :, channel],
-                                                         orient, pix_per_cell, cell_per_block,
-                                                         vis=False, feature_vec=True))
-                hog_features = np.ravel(hog_features)
-            else:
-                hog_features = self.extractfeatures.get_hog_features(feature_image[:, :, hog_channel], orient,
-                                                pix_per_cell, cell_per_block, vis=False, feature_vec=True)
-            # Append the new feature vector to the features list
-            features.append(hog_features)
+            if hog_feature == True:
+                if hog_channel == 'ALL':
+                    hog_features = []
+                    for channel in range(feature_image.shape[2]):
+                        hog_features.append(self.extractfeatures.get_hog_features(feature_image[:, :, channel],
+                                                             orient, pix_per_cell, cell_per_block,
+                                                             vis=False, feature_vec=True))
+                    hog_features = np.ravel(hog_features)
+                else:
+                    hog_features = self.extractfeatures.get_hog_features(feature_image[:, :, hog_channel], orient,
+                                                    pix_per_cell, cell_per_block, vis=False, feature_vec=True)
+                # Append the new feature vector to the features list
+                img_features.append(hog_features)
+            features.append(np.concatenate(img_features))
         # Return list of feature vectors
         return features
 
 
-    def visualizehogfeatures(self, imgfile, output_dir, car_image=True):
+    def visualizehogfeatures(self, imgfile, cspace='RGB', car_image=True):
 
-        carimage = mpimg.imread(imgfile)
+        image = cv2.imread(imgfile)
+        carimage = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+        convcarimage = np.copy(carimage)
+        if cspace != 'RGB':
+            if cspace == 'HSV':
+                convcarimage = cv2.cvtColor(carimage, cv2.COLOR_RGB2HSV)
+            elif cspace == 'LUV':
+                convcarimage = cv2.cvtColor(carimage, cv2.COLOR_RGB2LUV)
+            elif cspace == 'HLS':
+                convcarimage = cv2.cvtColor(carimage, cv2.COLOR_RGB2HLS)
+            elif cspace == 'YUV':
+                convcarimage = cv2.cvtColor(carimage, cv2.COLOR_RGB2YUV)
+            elif cspace == 'YCrCb':
+                convcarimage = cv2.cvtColor(carimage, cv2.COLOR_RGB2YCrCb)
+        else:
+            convcarimage = np.copy(carimage)
 
-        convcarimage = self.extractfeatures.convert_color(carimage, 'RGB2YCrCb')
         #for channel in range(convcarimage.shape[2]):
-        hogfeature, hogimage = self.extractfeatures.get_hog_features(convcarimage[:,:,2],
-                                         self.orient, self.pix_per_cell, self.cell_per_block,
-                                         vis=True, feature_vec=True)
+        if self.hog_channel == 'ALL':
+            hog_features = []
+            for channel in range(convcarimage.shape[2]):
+                hog_features.append(self.extractfeatures.get_hog_features(convcarimage[:, :, channel],
+                                                                          self.orient, self.pix_per_cell, self.cell_per_block,
+                                                                          vis=False, feature_vec=True))
+            hog_features = np.ravel(hog_features)
+        else:
+            hog_features, hogimage = self.extractfeatures.get_hog_features(convcarimage[:, :, self.hog_channel], self.orient,
+                                                                 self.pix_per_cell, self.cell_per_block, vis=True,
+                                                                 feature_vec=True)
+
         title=''
         if car_image:
             title = 'Car Image'
@@ -90,7 +124,7 @@ class HogClassifier:
         fig = plt.figure()
         plt.subplot(121)
         plt.imshow(carimage, cmap='gray')
-        plt.title(title)
+        plt.title(title+self.colorspace)
         plt.subplot(122)
         plt.imshow(hogimage, cmap='gray')
         plt.title('HOG Visualization')
@@ -114,7 +148,7 @@ class HogClassifier:
                                         pix_per_cell=self.pix_per_cell, cell_per_block=self.cell_per_block,
                                         hog_channel=self.hog_channel, spatial_size=(32, 32),
                                         hist_bins=32)
-        notcar_features = self.extract_features(notcars,orient=self.orient,
+        notcar_features = self.extract_features(notcars,cspace=self.colorspace,orient=self.orient,
                                         pix_per_cell=self.pix_per_cell, cell_per_block=self.cell_per_block,
                                         hog_channel=self.hog_channel, spatial_size=(32, 32),
                                         hist_bins=32)
@@ -124,19 +158,18 @@ class HogClassifier:
         # Create an array stack of feature vectors
         X = np.vstack((car_features, notcar_features)).astype(np.float64)
 
+        # Fit a per-column scaler
+        X_scaler = StandardScaler().fit(X)
+        # Apply the scaler to X
+        scaled_X = X_scaler.transform(X)
+
         # Define the labels vector
         y = np.hstack((np.ones(len(car_features)), np.zeros(len(notcar_features))))
 
         # Split up data into randomized training and test sets
-        rand_state = np.random.randint(0, 1000)
+        rand_state = np.random.randint(0, 100)
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=rand_state)
-
-        # Fit a per-column scaler
-        X_scaler = StandardScaler().fit(X_train)
-        # Apply the scaler to X
-        X_train = X_scaler.transform(X_train)
-        X_test = X_scaler.transform(X_test)
+            X, y, test_size=0.1, random_state=rand_state)
 
         print('Using:', self.orient, 'orientations', self.pix_per_cell,
               'pixels per cell and', self.cell_per_block, 'cells per block', self.colorspace, 'color space',
@@ -187,15 +220,18 @@ if __name__ == "__main__":
     hogclassifier = HogClassifier()
     # ind = np.random.randint(0, len(car_images))
     # colorspace = ['RGB', 'HSV', 'LUV', 'HLS', 'YUV', 'YCrCb']
+    # for color in colorspace:
+    #     hogclassifier.colorspace = color
+    #     hogclassifier.hog_channel = 2
+    #     hogclassifier.visualizehogfeatures(car_images[ind], True)
+    #     hogclassifier.visualizehogfeatures(not_car_images[ind], True)
+
     # hogchannel = [0, 1, 2, 'ALL']
-    hogclassifier.sample_size = 2000
     # for color in colorspace:
     #     for hog in hogchannel:
     #         hogclassifier.colorspace = color
     #         hogclassifier.hog_channel = hog
     #         hogclassifier.classify_images(car_images, not_car_images)
-    # hogclassifier.visualizehogfeatures(car_images[ind],hogimg_output_dir_name, True)
-    # hogclassifier.visualizehogfeatures(not_car_images[ind], hogimg_output_dir_name, False)
 
     #Train and save 'ycrcb' hog classifier
     hogclassifier.colorspace = 'YCrCb'
