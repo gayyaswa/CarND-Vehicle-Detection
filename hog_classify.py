@@ -169,7 +169,7 @@ class HogClassifier:
         # Split up data into randomized training and test sets
         rand_state = np.random.randint(0, 100)
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.1, random_state=rand_state)
+            scaled_X, y, test_size=0.1, random_state=rand_state)
 
         print('Using:', self.orient, 'orientations', self.pix_per_cell,
               'pixels per cell and', self.cell_per_block, 'cells per block', self.colorspace, 'color space',

@@ -1,4 +1,3 @@
-import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -28,7 +27,7 @@ class HogSubSampler:
         self.ystart = 400
         self.ystop = 656
         self.scale = 1.5
-        self.heatmaps = deque(maxlen=20)
+        self.heatmaps = deque(maxlen=10)
 
         return
 
@@ -136,10 +135,10 @@ class HogSubSampler:
         # Return the image
         return img
 
-    def get_average_thresholded_heatmap(self, heatmap, threshold):
+    def sumheatmapoverframes(self, heatmap, threshold):
         self.heatmaps.append(heatmap)
-        total_heatmap = np.sum(self.heatmaps, axis=0)
-        return self.apply_threshold(total_heatmap, threshold)
+        heatmapsum = np.sum(self.heatmaps, axis=0)
+        return self.apply_threshold(heatmapsum, threshold)
 
     def processimage(self, image, visualization=False):
 
@@ -155,8 +154,8 @@ class HogSubSampler:
         heat = self.add_heat(heat, bbox_list)
 
         # Apply threshold to help remove false positives
-        #heat = self.get_average_thresholded_heatmap(heat,15)
-        heat = self.apply_threshold(heat, 2)
+        heat = self.sumheatmapoverframes(heat,4)
+        #heat = self.apply_threshold(heat, 2)
 
         # Visualize the heatmap when displaying
         heatmap = np.clip(heat, 0, 255)
