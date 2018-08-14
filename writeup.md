@@ -53,7 +53,7 @@ These parameters were chosen based on the SVC model accuracy and having hog extr
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-As suggested in the lecture video Linear SVM was used to classify the vehicle images and following are the various combination of paramters used to train the model with subset of actual data and the above paramter configuration was finalized in order to get higher accuray of ~99% so that the vehicles could be detected from the video with minimum false positives.
+As suggested in the lecture video Linear SVM was used to classify the vehicle images and the table below lists the various combination of parameters tried on subset of the training data to gather accuracy and training times. The parameters listed above was finalized in order to get higher accuray of ~99% so that the vehicles could be detected from the video with minimum false positives.
 
 With the parameters finalzied the SVM model was training using the entire dataset and was able to acheive an accuracy of 99.7% in 'YCrCb' colorspace.
 
