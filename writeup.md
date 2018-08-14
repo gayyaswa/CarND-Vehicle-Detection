@@ -39,13 +39,8 @@ The vehicles and non-vehicles present in the given image dataset was balanced an
 Various color space images both in vehicle and non-vehicle dataset was visualized using `skimage.hog()` as below
 
 
-![hog image](output_images/hog_visualization/Car_HLS.png)  | ![hog image](output_images/hog_visualization/Not_Car_HLS.png)
------------------------------------------------------------| -------------------------------------------------------------
-![hog image](output_images/hog_visualization/Car_HSV.png)  | ![hog image](output_images/hog_visualization/Not_Car_HSV.png)
-![hog image](output_images/hog_visualization/Car_LUV.png)  | ![hog image](output_images/hog_visualization/Not_Car_LUV.png)
-![hog image](output_images/hog_visualization/Car_RGB.png)  | ![hog image](output_images/hog_visualization/Not_Car_RGB.png)
 ![hog image](output_images/hog_visualization/Car_YCrCb.png)  | ![hog image](output_images/hog_visualization/Not_Car_YCrCb.png)
-![hog image](output_images/hog_visualization/Car_YUV.png)  | ![hog image](output_images/hog_visualization/Not_Car_YUV.png)
+-----------------------------------------------------------| -------------------------------------------------------------
 
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
@@ -94,43 +89,40 @@ The code for SVM Linear classifer training is in function `classify_images` line
 | YCrCb              | 2                     |1764              | 0.96               | 1.81                  |8.51             |
 | YCrCb              | ALL                   |5292              | 0.99               | 0.52                  |19.30            |
  
-### Sliding Window Search
+### HOG Subsampling approach
 
 #### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
+I decided to use HOG Subsampling approach to search for cars in the images. 
 
-![alt text][image3]
+The search space was reduced along the Y ( 400,656 ) dimension and was limited to the near vicinity of the vehicle and also sampling rate of 64 was chosen after trying various values (64,96,128) as it gave better results. I also tried various scale factor 1.0, 1.5, 2.0 and 2.5 and decided upon 1.5 on which the cars were identified with minimum false detection
+
+The code for hog subsampling is in `find_cars` lines 36 through 106 of `hogsubsampler.py`
+
+![subsample image](output_images/hog_subsampling/test1.png)  | ![subsample image](output_images/hog_subsampling/test2.png)
+-------------------------------------------------------------| -------------------------------------------------------------
+![subsample image](output_images/hog_subsampling/test3.png)  | ![subsample image](output_images/hog_subsampling/test4.png)
+![subsample image](output_images/hog_subsampling/test5.png)  | ![subsample image](output_images/hog_subsampling/test6.png)
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
+Using the above determined Linear SVM parameters and with HOG subsampler approach as suggested in lecture was able to optimize the vehicle detection performance bycalculating HOG features once and sub sample per window. The following is the output for test image pipeline and was able to identify the vehicles successfully. The vehicle in test4.jpg wasn't detected as it was outside the sampled Y dimension near vicinity (400,566)
 
-![alt text][image4]
+![subsample image](output_images/heat_visualization/test1.png)  | ![subsample image](output_images/heat_visualization/test2.png)
+----------------------------------------------------------------| ---------------------------------------------------------------
+![subsample image](output_images/heat_visualization/test3.png)  | ![subsample image](output_images/heat_visualization/test4.png)
+![subsample image](output_images/heat_visualization/test5.png)  | ![subsample image](output_images/heat_visualization/test6.png)
 ---
 
 ### Video Implementation
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./test.mp4)
 
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
-
-Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
-
-### Here are six frames and their corresponding heatmaps:
-
-![alt text][image5]
-
-### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
-
-### Here the resulting bounding boxes are drawn onto the last frame in the series:
-![alt text][image7]
-
+I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected. For the video heat map values across 10 frames is computed and the detected blobs are drawn after meeting a threshold of 4 to avoid false positive detection and also to ensure smooth drawing of the detected blobs.
 
 
 ---
@@ -139,5 +131,7 @@ Here's an example result showing the heatmap from a series of frames of video, t
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+* Vehicles were detected in the opposite direction and probably to get better perception for the autonomous vehicle these need to be differentiate as against traffic
+* In certain angle the vehicle wasn't detected for fewer frames and need to be handled as this was happening at the near vehicle vicinity
+* Having the input features passed at incorrect scale and incorrect color space resulted in lot of false positives.
 
