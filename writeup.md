@@ -32,25 +32,32 @@ The goals / steps of this project are the following:
 
 #### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The code for this step is contained in the first code cell of the IPython notebook (or in lines # through # of the file called `some_file.py`).  
+The code for HOG feature extraction is in function `get_hog_features.py` lines 18 through 37 of the file `extractfeatures.py
 
-I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
+The vehicles and non-vehicles present in the given image dataset was balanced and approximately 8600 images and decided to proceed further to find out the accuracy of model.
 
-![hog image](output_images/hog_visualization/Car_HLS.PNG)  | ![hog image](output_images/hog_visualization/Not_Car_HLS.PNG)
------------------------------------------------------------| ---------------------------------------------------------
-![hog image](output_images/hog_visualization/Car_HSV.PNG)  | ![hog image](output_images/hog_visualization/Not_Car_HSV.PNG)
+Various color space images both in vehicle and non-vehicle dataset was visualized using `skimage.hog()` as below
 
 
-I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
+![hog image](output_images/hog_visualization/Car_HLS.png)  | ![hog image](output_images/hog_visualization/Not_Car_HLS.png)
+-----------------------------------------------------------| -------------------------------------------------------------
+![hog image](output_images/hog_visualization/Car_HSV.png)  | ![hog image](output_images/hog_visualization/Not_Car_HSV.png)
+![hog image](output_images/hog_visualization/Car_LUV.png)  | ![hog image](output_images/hog_visualization/Not_Car_LUV.png)
+![hog image](output_images/hog_visualization/Car_RGB.png)  | ![hog image](output_images/hog_visualization/Not_Car_RGB.png)
+![hog image](output_images/hog_visualization/Car_YCrCb.png)  | ![hog image](output_images/hog_visualization/Not_Car_YCrCb.png)
+![hog image](output_images/hog_visualization/Car_YUV.png)  | ![hog image](output_images/hog_visualization/Not_Car_YUV.png)
 
-Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
-
-
-![alt text][image2]
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+```python
+self.orient = 9
+self.pix_per_cell = 8
+self.cell_per_block = 2
+self.hog_channel = 'ALL'  # Can be 0, 1, 2, or "ALL"
+```
+
+These parameters were chosen based on the SVC model accuracy and having hog extraction performed with "ALL" channels for the color space increased the number of features available for training the model
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
