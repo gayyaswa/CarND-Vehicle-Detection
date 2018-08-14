@@ -128,7 +128,7 @@ I recorded the positions of positive detections in each frame of the video.  Fro
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-* Vehicles were detected in the opposite direction and probably to get better perception for the autonomous vehicle these need to be differentiate as against traffic
+* Vehicles were detected in the opposite direction and probably to get better perception for the autonomous vehicle these need to be differentiated as against traffic
 * In certain angle the vehicle wasn't detected for fewer frames and need to be handled as this was happening at the near vehicle vicinity
 * Having the input features passed at incorrect scale and incorrect color space resulted in lot of false positives.
 
