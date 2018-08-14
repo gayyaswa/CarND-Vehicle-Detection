@@ -47,6 +47,7 @@ class HogClassifier:
                 elif cspace == 'LUV':
                     feature_image = cv2.cvtColor(image, cv2.COLOR_RGB2LUV)
                 elif cspace == 'HLS':
+
                     feature_image = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
                 elif cspace == 'YUV':
                     feature_image = cv2.cvtColor(image, cv2.COLOR_RGB2YUV)
@@ -218,13 +219,13 @@ if __name__ == "__main__":
     not_car_images = glob.glob('./examples/trainingset/non-vehicles/**/*.PNG', recursive=True)
 
     hogclassifier = HogClassifier()
-    # ind = np.random.randint(0, len(car_images))
-    # colorspace = ['RGB', 'HSV', 'LUV', 'HLS', 'YUV', 'YCrCb']
-    # for color in colorspace:
-    #     hogclassifier.colorspace = color
-    #     hogclassifier.hog_channel = 2
-    #     hogclassifier.visualizehogfeatures(car_images[ind], True)
-    #     hogclassifier.visualizehogfeatures(not_car_images[ind], True)
+    ind = np.random.randint(0, len(car_images))
+    colorspace = ['RGB', 'HSV', 'LUV', 'HLS', 'YUV', 'YCrCb']
+    for color in colorspace:
+        hogclassifier.colorspace = color
+        hogclassifier.hog_channel = 2
+        hogclassifier.visualizehogfeatures(car_images[ind], True)
+        hogclassifier.visualizehogfeatures(not_car_images[ind], True)
 
     # hogchannel = [0, 1, 2, 'ALL']
     # for color in colorspace:
@@ -234,8 +235,8 @@ if __name__ == "__main__":
     #         hogclassifier.classify_images(car_images, not_car_images)
 
     #Train and save 'ycrcb' hog classifier
-    hogclassifier.colorspace = 'YCrCb'
-    hogclassifier.hog_channel = 'ALL'
-    hogclassifier.classify_images(car_images, not_car_images,True)
+    # hogclassifier.colorspace = 'YCrCb'
+    # hogclassifier.hog_channel = 'ALL'
+    # hogclassifier.classify_images(car_images, not_car_images,True)
 
     print('function main called')
