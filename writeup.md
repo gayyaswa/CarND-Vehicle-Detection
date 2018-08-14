@@ -32,7 +32,7 @@ The goals / steps of this project are the following:
 
 #### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The code for HOG feature extraction is in function `get_hog_features.py` lines 18 through 37 of the file `extractfeatures.py
+The code for HOG feature extraction is in function `get_hog_features.py` lines 18 through 37 of the file `extractfeatures.py'
 
 The vehicles and non-vehicles present in the given image dataset was balanced and approximately 8600 images and decided to proceed further to find out the accuracy of model.
 
@@ -61,7 +61,11 @@ These parameters were chosen based on the SVC model accuracy and having hog extr
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using...
+As suggested in the lecture video Linear SVM was used to classify the vehicle images and following are the various combination of paramters used to train the model with subset of actual data and the above paramter configuration was finalized in order to get higher accuray of ~99% so that the vehicles could be detected from the video with minimum false positives.
+
+With the parameters finalzied the SVM model was training using the entire dataset and was able to acheive an accuracy of 99.7% in 'YCrCb' colorspace.
+
+The code for SVM Linear classifer training is in function `classify_images` lines 135 through 213 of the file `hog_classify.py'
 
 | Color Space        | HOG Channel           | Features Length  | SVC Test Accuracy  |  SVC Training Time(s) | Extract HOG (s) |
 | ------------------ |:---------------------:| ----------------:|-------------------:|----------------------:|-----------------:
